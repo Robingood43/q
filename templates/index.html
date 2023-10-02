@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Мой сайт</title>
+  <style>
+  :root {
+    --primary-font: 'Open Sans', sans-serif;
+    --secondary-font: 'Nunito', sans-serif;
+    --main-background: var(--main-background);
+  }
+
+  body {
+    overflow-y: scroll;
+    font-family: var(--primary-font);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    -webkit-animation: fadein 2s;
+    animation: fadein 2s;
+    color: var(--primary-color);
+    font-family: sans-serif;
+    line-height: 1.4;
+    font-weight: 400;
+    background-color: var(--main-background);
+    word-wrap: break-word;
+  }
+
+  .navbar, .menu {
+    font-family: var(--primary-font);
+    padding: 20px;
+    display: flex;
+    justify-content: left;
+    list-style: none
+  }
+
+  .navbar a, .menu__link, .submenu__link {
+    font-size: 1.5em;
+    margin-right: 20px;
+    color: #000;
+    text-decoration: none;
+
+  }
+  .all{
+  opacity: 0;
+    animation: fadeIn 2s forwards;
+  }
+  .background {
+      text-shadow: 0 2px #000;
+    font-family: var(--secondary-font);
+    width: 100%;
+    height: 500px;
+    background: url('{{ url_for('static', path='image.jpg') }}') no-repeat center center fixed;
+    background-size: cover;
+ }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  h1 {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    top: 300px;
+    color: white;
+    transform: translateY(-50%);
+  }
+  .submenu {
+    list-style: none;
+    margin: 0;
+    display: none;
+    position: absolute;
+    top: AUTO;
+    left: AUTO;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
+  }
+
+  .submenu__item {
+    padding: 10px;
+  }
+
+  .menu__item-parent:hover .submenu {
+    display: block;
+  }
+
+  .main, .container, .announce__item {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #12972F30;
+    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    padding: 1.5em;
+    flex: 1 1 100%;
+    font-size: .75em;
+    display: flex;
+  }
+
+  .item {
+    border-radius: 12px;
+    transition: all linear .2s;
+    word-break: break-word;
+    margin-bottom: 0.5rem;
+    padding: 1.5em;
+    margin-bottom: 0.5rem;
+    background: white;
+  }
+    .middle-text {
+    flex: 1 1 100%;
+    font-family: var(--secondary-font);
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: white;
+    color: black;
+    padding: 30px;
+    text-align: center;
+    padding-top: 3em;
+    padding-bottom: 3em;
+    display: flex;
+  }
+  .item__content, .announce__content {
+
+    width: 100%;
+}
+  </style>
+</head>
+<body class ="all">
+  <div class="navbar">
+    <a href="/">Главная</a>
+    <a href="news.html">Новости</a>
+    <a href="documents.html">Документы</a>
+    <a href="contact.html">Контакты</a>
+    <a href="svz.html">Обратная связь</a>
+  </div>
+
+  <div class="background">
+    <h1>САДОВОДЧЕСКОЕ НЕКОММЕРЧЕСКОЕ ТОВАРИЩЕСТВО "ШИННИК-1"</h1>
+  </div>
+
+  <nav class="heading__menu container">
+  <ul class="menu menu--secondary">
+
+    <li class="menu__item menu__item-parent">
+  <a class="menu__link" href="#">КВИТАНЦИИ ДЛЯ ОПЛАТЫ <img src="{{ url_for('static', path='img.png') }}"  width="10"></a>
+  <ul class="submenu">
+
+    <li class="submenu__item">
+      <a class="submenu__link" href="/pages/kvitancii-dlya-oplaty/kvitanciya-dlya-oplaty-chlenskih-i-celevyh-vznosov/">Квитанция для оплаты членских и целевых взносов</a>
+    </li>
+
+   <li class="submenu__item"><a class="submenu__link" href="/pages/kvitancii-dlya-oplaty/kvitanciya-dlya-oplaty-elektroenergii/">Квитанция для оплаты электроэнергии</a>
+</li>
+
+  <li class="submenu__item"><a class="submenu__link" href="/pages/kvitancii-dlya-oplaty/razmer-ezhegodnogo-vznosa-platy/">Размер ежегодного взноса (платы)</a>
+</li>
+
+  <li class="submenu__item"><a class="submenu__link" href="/pages/kvitancii-dlya-oplaty/obrazec-zapolneniya-kvitancii-na-oplatu-elektroenergii/">Образец заполнения квитанции на оплату электроэнергии</a>
+</li>
+
+  <li class="submenu__item"><a class="submenu__link" href="/pages/kvitancii-dlya-oplaty/obrazec-zapolneniya-kvitancii-na-oplatu-vznosov/">Образец заполнения квитанции на оплату взносов</a>
+</li>
+
+  </ul>
+</li>
+</li> <li class="menu__item"> <a class="menu__link" href="/pages/tarify-na-elektroenergiyu/">Тарифы на электроэнергию</a> </li> <li class="menu__item"> <a class="menu__link" href="/pages/raspisanie-raboty-pravleniya/">Расписание работы правления</a> </li> <li class="menu__item"> <a class="menu__link" href="/pages/telefony-goryachih-liniy/">ТЕЛЕФОНЫ ГОРЯЧИХ ЛИНИЙ</a> </li> </ul> </nav> <br></br>
+  </nav>
+   <div class="middle-text">
+    <h2>Добро пожаловать на сайт ТСН СНТ "ШИННИК-1"
+"!</h2>
+	<p>На этом сайте размещена информация и новости о том, что происходит в СНТ. Сайт является средством коммуникации Председателя и Правления СНТ с его членами и другими заинтересованными сторонами.</p>
+  </div>
+  <main class="main container container--grid widebg">
+    <section class="announce section--swiper", style="
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+">
+      <h2 class="section__title">Важные объявления</h2>
+      <div class="items swiper-wrapper announce__list">
+        {% for ad in ads %}
+          <article class="item swiper-slide list__item announce__item">
+
+            <div class="item__content announce__content">
+                <h2 class="item__title announce__title">{{ ad.title }}</h2>
+                <div class="item__intro item__text">{{ ad.description }}</div>
+                <div class="item__date announce__date">{{ ad.date }}</div>
+            </div>
+
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+
+  <script>
+    window.onload = function() {
+      document.querySelector(".all").style.opacity = 1;
+    };
+  </script>
+
+</body>
+</html>
