@@ -2,7 +2,7 @@ fastapi
 sqlalchemy
 sqlalchemy_utils
 python-dotenv
-starlette==0.31.1
+starlette
 jinja2
 pydantic
 asyncpg
