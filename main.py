@@ -12,7 +12,7 @@ from models import Ad, Document
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None)
 app.mount("/static/image", StaticFiles(directory="static/image"), name="static")
 templates = Jinja2Templates(directory="templates")
 session = async_sessionmaker(bind=engine, expire_on_commit=False)
