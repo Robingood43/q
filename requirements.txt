@@ -7,4 +7,4 @@ pydantic[email]
 jinja2
 python-multipart
 starlette
-
+aiosmtplib
