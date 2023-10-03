@@ -33,11 +33,14 @@ async def download_document(document_name):
 
 @app.get("/documents.html", response_class=HTMLResponse)
 async def get_documents(request: Request):
-    all_docs_db = {i.filename for i in await db.get_all(session)}
+    all_data = await db.get_all(session)
+    all_docs_db = {i.filename for i in all_data}
     all_docs_path = {os.path.basename(i) for i in glob.glob("static/documents/*")}
     docs_add = all_docs_path.difference(all_docs_db)
     docs_delete = all_docs_db.difference(all_docs_path)
-
+    if not docs_add and not docs_delete:
+        return templates.TemplateResponse("documents.html",
+                                          {"request": request, "documents": all_data})
     if docs_add:
         new_docs = [Document(size = f"{(os.path.getsize('static/documents/'+filename) / 1024):.2f}",
                             filename = filename,
