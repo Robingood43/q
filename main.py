@@ -38,9 +38,7 @@ async def get_documents(request: Request):
     all_docs_path = {os.path.basename(i) for i in glob.glob("static/documents/*")}
     docs_add = all_docs_path.difference(all_docs_db)
     docs_delete = all_docs_db.difference(all_docs_path)
-    if not docs_add and not docs_delete:
-        return templates.TemplateResponse("documents.html",
-                                          {"request": request, "documents": all_data})
+    
     if docs_add:
         new_docs = [Document(size = f"{(os.path.getsize('static/documents/'+filename) / 1024):.2f}",
                             filename = filename,
