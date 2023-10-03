@@ -3,6 +3,7 @@ from pydantic import BaseModel, EmailStr
 from db import Base
 from sqlalchemy import Column, Integer, String
 
+
 class Document(Base):
     __tablename__ = "documents"
 
@@ -12,23 +13,31 @@ class Document(Base):
     date = Column(String)
     __table_args__ = {'schema': 'new_public'}
 
+
 class Ad(BaseModel):
     title: str
-    date:str
+    date: str
     description: str
+
 
 class MyUploadFile(BaseModel):
     filename: str
     content_type: str
-    filetext: bytes|None
+    filetext: bytes = None
 
     @classmethod
     async def from_uploadfile(cls, upload_file: UploadFile):
-        return cls(
-            filename= upload_file.filename,
-            content_type= upload_file.content_type,
-            filetext = await upload_file.read() if upload_file.filename else None
-        )
+        if upload_file.filename:
+            return cls(
+                filename=upload_file.filename,
+                content_type=upload_file.content_type,
+                filetext=await upload_file.read() 
+            )
+        else:
+            return cls(
+                filename=upload_file.filename,
+                content_type=upload_file.content_type,
+            )
 
 class ContactForm(BaseModel):
     user_name: str
@@ -36,4 +45,3 @@ class ContactForm(BaseModel):
     user_phone: str
     message: str
     file: MyUploadFile = None
-
