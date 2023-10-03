@@ -123,7 +123,7 @@ h1 {
     </div>
     <main class="main container">
         <div class="documents__list">
-            {% for document in documents %}
+            {% for document in documents|reverse %}
                 <div class="document">
                     <h3 class="document__name">{{ document.filename }}</h3>
                     <p class="document__desc"></p>
