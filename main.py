@@ -1,5 +1,5 @@
-import glob
 import os
+import glob
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -35,20 +35,16 @@ async def download_document(document_name):
 async def get_documents(request: Request):
     all_docs_db = {i.filename for i in await db.get_all(session)}
     all_docs_path = {os.path.basename(i) for i in glob.glob("static/documents/*")}
-
     docs_add = all_docs_path.difference(all_docs_db)
     docs_delete = all_docs_db.difference(all_docs_path)
+
     if docs_add:
-        for filename in docs_add:
-            new_docs = Document(
-                size = f"{(os.path.getsize('static/documents/'+filename) / 1024):.2f}",
-                filename = filename,
-                date = f"{datetime.datetime.now().strftime('%d.%m.%Y')}"
-            )
-            await db.add(session, new_docs)
+        new_docs = [Document(size = f"{(os.path.getsize('static/documents/'+filename) / 1024):.2f}",
+                            filename = filename,
+                            date = f"{datetime.datetime.now().strftime('%d.%m.%Y')}")for filename in docs_add]
+        await db.add(session, new_docs)
+
     if docs_delete:
-        for docs in await db.get_all(session):
-            if docs.filename in docs_delete:
-                await db.delete(session, docs)
+        await db.delete(session, list(docs_delete))
 
     return templates.TemplateResponse("documents.html", {"request": request, "documents": await db.get_all(session)})
