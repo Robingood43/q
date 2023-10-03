@@ -1,9 +1,10 @@
 fastapi
 sqlalchemy
-sqlalchemy_utils
 python-dotenv
-starlette
-jinja2
-pydantic
-asyncpg
 uvicorn
+asyncpg
+pydantic[email]
+jinja2
+python-multipart
+starlette
+
