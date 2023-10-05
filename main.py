@@ -54,7 +54,7 @@ async def open_pdf(filename: str, request: Request):
                     pix = page.get_pixmap()  # render page to an image
                     pix.save(f"static/temporary/{filename}/{filename}page-{page.number}.png")
                     pdf_images.append(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": pdf_images})
+                return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": pdf_images, 'filename':filename}})
             except fitz.fitz.FileNotFoundError as e:
                 pdf_images = []
                 doc = fitz.open(f'static/documents/{filename}')  # open document
@@ -63,7 +63,7 @@ async def open_pdf(filename: str, request: Request):
                     pix = page.get_pixmap()  # render page to an image
                     pix.save(f"static/temporary/{filename}/{filename}page-{page.number}.png")
                     pdf_images.append(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": pdf_images})
+                return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": pdf_images, 'filename':filename}})
 
 
 @app.get("/", response_class=HTMLResponse)
