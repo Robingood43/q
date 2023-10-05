@@ -209,18 +209,21 @@ def decode_access_token(token: str):
 
 @app.post("/token")
 async def login(response: Request, form_data: OAuth2PasswordRequestForm = Depends(), ):
-    user = await db.user_check(session, form_data.username)
-    if not user:
-        response.session["flash"] = {"error": "Неверные данные!"}
-        return RedirectResponse(url='/auth.html', status_code=status.HTTP_302_FOUND)
-    if not verify_password(form_data.password, user.hashed_password):
-        response.session["flash"] = {"error": "Неверные данные!"}
-        return RedirectResponse(url='/auth.html', status_code=status.HTTP_302_FOUND)
-    response.session["flash"] = {"success": "Успешная авторизация!"}
-    access_token = create_access_token(data={"sub": user.username})
-    # Установка JWT как cookie
-    response.session["access_token"] = f"bearer {access_token}"
-    return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
+        try:
+            user = await db.user_check(session, form_data.username)
+            if not user:
+                response.session["flash"] = {"error": "Неверные данные!"}
+                return RedirectResponse(url='/auth.html', status_code=status.HTTP_302_FOUND)
+            if not verify_password(form_data.password, user.hashed_password):
+                response.session["flash"] = {"error": "Неверные данные!"}
+                return RedirectResponse(url='/auth.html', status_code=status.HTTP_302_FOUND)
+            response.session["flash"] = {"success": "Успешная авторизация!"}
+            access_token = create_access_token(data={"sub": user.username})
+            # Установка JWT как cookie
+            response.session["access_token"] = f"bearer {access_token}"
+            return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
+        except Exception as ex:
+                print(ex)
 
 
 def cookie_oauth2_scheme(request: Request):
