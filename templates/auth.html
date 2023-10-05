@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ТСН СНТ ШИННИК-1 | Авторизация</title>
+  <style>
+  :root {
+    --primary-font: 'Open Sans', sans-serif;
+    --secondary-font: 'Nunito', sans-serif;
+    --light-color: #ccc;
+  }
+
+  body {
+    overflow-y: scroll;
+    font-family: var(--primary-font);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    -webkit-animation: fadein 2s;
+    animation: fadein 2s;
+    color: var(--primary-color);
+    line-height: 1.4;
+    font-weight: 400;
+    word-wrap: break-word;
+    background-color: var(--main-background);
+    font-family: var(--primary-font);
+    font-size: 1.5em;
+  }
+    .message {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f44336d6;
+  color: white;
+  padding: 16px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: none;
+}
+
+    button.close {
+      float: right;
+      font-size: 1.5em;
+      font-weight: bold;
+      line-height: 1;
+      color: white;
+      opacity: .5;
+      border: none;
+      background: transparent;
+    }
+  .button {
+    background-color: #12972F30; /* Измените это на любой цвет, соответствующий вашему сайту */
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 16px;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .button:hover {
+    background-color: #007f5f; /* Измените это на любой цвет, соответствующий вашему сайту */
+  }
+  .navbar, .menu {
+    font-family: var(--primary-font);
+    padding: 20px;
+    display: flex;
+        justify-content: space-between;
+    list-style: none
+  }
+
+  .navbar a, .menu__link {
+    font-size: 1.33em;
+    margin-right: 20px;
+    color: #000;
+    text-decoration: none;
+  }
+
+  .all {
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+  }
+
+  .background { background-image: url('{{ url_for('static', path='image.jpeg') }}'); }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1340px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+
+  .heading__title {
+    font-size: 3rem;
+    line-height: 1.2;
+    margin: 1rem 0;
+    font-family: var(--secondary-font);
+  }
+
+  .main, .announce__item {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #12972F30;
+    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    padding: 1.5em;
+    flex: 1 1 100%;
+    font-size: .75em;
+  }
+
+  .item {
+    border-radius: 12px;
+    transition: all linear .2s;
+    word-break: break-word;
+    margin-bottom: 0.5rem;
+    padding: 1.5em;
+    background: white;
+  }
+
+  .middle-text {
+    flex: 1 1 100%;
+    font-family: var(--secondary-font);
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: linear-gradient(135deg, #f9f7f7 0%, #ffffff 100%);
+    border-radius: 10px;
+    color: black;
+    padding: 30px;
+    text-align: center;
+    padding-top: 3em;
+    padding-bottom: 3em;
+  }
+
+  form input[type="submit"] {
+    background: linear-gradient(145deg, #cfd9df, #e2ebf0);
+    box-shadow:  6px 6px 8px 0 rgba(0, 0, 0, 0.2),
+                -6px -6px 8px 0 rgba(255, 255, 255, 0.5);
+    border: none;
+    border-radius: 24px;
+    padding:10px 50px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+form input[type="submit"] {
+    background: #12972fb8; /* серый цвет фона кнопки */
+    box-shadow:  6px 6px 8px 0 rgba(0, 0, 0, 0.2),
+                -6px -6px 8px 0 rgba(255, 255, 255, 0.5);
+    border: none;
+    border-radius: 24px;
+    padding:10px 50px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top:15px;
+  }
+
+  form input[type="submit"]:hover {
+    background: #6f6f6f; /* немного темнее для ховера */
+  }
+
+  form input[type="text"], form input[type="password"] {
+    margin: 10px 0;
+    padding: 10px;
+    width: 300px;
+    border: none;
+    background: #f7f0b5; /* голубой цвет фона для полей ввода */
+    border-radius: 10px;
+    box-shadow: 0 0 10px 1px hsl(0deg 0% 0% / 56%);
+    font-size: 1.3em;
+  }
+
+ /*@media для корректного отображения на мобильном устройстве */
+@media screen and (max-width: 800px) {
+    form input[type="submit"] {
+        font-size: 1.5em;
+    }
+}
+
+  form label {
+    display: flex;
+    margin-bottom: -10px;
+    font-size: 1.5em;
+    color: var(--light-color);
+    font-size: .875em;
+  }
+
+  form div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media screen and (max-width: 800px) {
+    body { font-size: 14px; }
+
+    .navbar { display: unset; flex-direction: column; }
+
+    .navbar a { font-size: 1.2em; margin-bottom: 10px; }
+
+    .container { width: 100%; font-size: 0.8em; padding: 1em; align-items:normal }
+
+    .middle-text { padding: 10px; font-size: 0.9em; }
+  }
+  </style>
+</head>
+<body class="all">
+{% if 'error' in messages %}
+  <div class="message message--error">
+    <button class="close">&times;</button>
+    <p>{{ messages['error'] }}</p>
+  </div>
+{% elif 'success' in messages %}
+  <div class="message message--success">
+    <button class="close">&times;</button>
+    <p>{{ messages['success'] }}</p>
+  </div>
+{% endif %}
+<div class="navbar">
+    <div>
+    <a href="/">Главная</a>
+    <a href="/news.html">Новости</a>
+    <a href="/documents.html">Документы</a>
+    <a href="/contact.html">Контакты</a>
+    </div>
+    <div>
+    <a href="/auth.html"class="button">Вход</a>
+    <a href="/profile.html"class="button">Профиль</a>
+        </div>
+  </div>
+  <div class="heading">
+      <div class="container">
+          <h1 class="heading__title">Вход</h1>
+      </div>
+  </div>
+
+  <div class="middle-text">
+
+    <form action="/token" method="post">
+      <label for="username">Имя пользователя</label>
+      <input type="text" id="username" name="username"><br><br>
+      <label for="password">Пароль</label>
+      <input type="password" id="password" name="password"><br>
+      <input type="submit" value="Войти">
+    </form>
+  </div>
+
+
+  <script>
+    window.onload = function() {
+      document.querySelector(".all").style.opacity = 1;
+    };
+  </script>
+<script>
+window.onload = function() {
+  var messages = document.querySelectorAll('.message');
+  messages.forEach(function(msg) {
+    msg.style.display = 'block';
+
+    var closeBtn = msg.querySelector('.close');
+    closeBtn.addEventListener('click', function() {
+      msg.style.display = 'none';
+    });
+
+    setTimeout(function() {
+      msg.style.display = 'none';
+    }, 5000);
+  });
+
+  document.querySelector(".all").style.opacity = 1;
+};
+</script>
+</body>
+</html>

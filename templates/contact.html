@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <style>
+        :root { 
+            --primary-font: 'Open Sans', sans-serif; 
+            --secondary-font: 'Nunito', sans-serif; 
+            --secondary-color: #12972F; 
+            --secondary-background: rgba(241, 241, 241, 1); 
+            --light-color: #ccc; 
+        } 
+
+        body{
+            --lighter-color: rgba(128, 128, 128, 1); 
+            overflow-y: scroll; 
+            font-family: var(--primary-font); 
+            font-size: 1.5em; 
+            background-color: #f2f2f2; 
+            color: #333; 
+        }
+  .button {
+    background-color: #12972F30; /* Измените это на любой цвет, соответствующий вашему сайту */
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 16px;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .button:hover {
+    background-color: #007f5f; /* Измените это на любой цвет, соответствующий вашему сайту */
+  }
+        .navbar {
+            font-family: var(--primary-font);
+            background-color: rgba(255,255,255,0.5);
+            padding: 20px;
+                display: flex;
+    justify-content: space-between;
+            border-bottom:1px solid var(--secondary-background);
+        }
+
+        .navbar a {
+            margin-right: 20px;
+            color: #000;
+            text-decoration: none;
+        }
+
+        .form__label {
+            display: block;
+            font-weight: 400;
+            font-size: .8125em;
+            color: var(--lighter-color);
+            margin-bottom: 0.5em;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1340px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 2em;
+            padding-right: 2em;
+        }
+
+        .heading__title {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin: 1rem 0;
+            font-family: var(--secondary-font);
+        }
+
+        p {
+            display: block;
+            margin-block-start: 1em;
+            margin-block-end: 1em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+        }
+
+        .contact__details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .contact {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 80px;
+        }
+
+        .contact__item {
+            padding: 0.5em 0;
+        }
+
+        .contact__extra {
+            flex: 1 2 100%;
+         }
+
+        .contact__map {
+            height: 400px;
+            width: 900px;
+            overflow: hidden;
+        }
+
+        .contact__form {
+            max-width: 30em;
+        }
+
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .contact__label {
+            color: var(--light-color);
+            font-size: .875em;
+            margin-bottom: .5em;
+        }
+
+        .contact__form {
+        --ck-z-default: 1;
+        --ck-z-modal: calc(var(--ck-z-default) + 999);
+        box-sizing: border-box;
+        transition: inherit;
+        }
+
+        #feedback-form .form__input{
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 96%;
+        
+            font-size: .875em;
+            line-height: 1.5;
+            padding: 0.85em;
+            font-family: var(--primary-font);
+        }
+
+        #feedback-form .form__input[type="file"]{
+            border: 0;
+            margin-bottom: 0;
+        }
+
+        .form__item.form__item--file {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form__item.form__item--file .label-file {
+            cursor: pointer;
+            text-align:center;
+            color: #999;
+            border: 1px solid #999;
+            border-radius: 3px;
+            padding: 6px 12px;
+            display:inline-block;
+            width: 100%;
+        }
+
+        .form__item.form__item--file .label-file:hover{
+            background: #f1f1f1;
+            color: #333;
+            transition: all .3s;
+        }
+
+        .form__item.form__item--file input[type=file] {
+            position: absolute;
+            display: block;
+            visibility: hidden;
+        }
+
+        .btn.btn-submit{
+            color: #fff;
+            background: var(--secondary-color);
+            border: 0;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        @media screen and (max-width: 1200px) {
+    /* Стили, которые применяются для экранов с шириной 1200px и меньше */
+    .container {
+        padding: 1em;
+        max-width: 100%;
+    }
+
+    .contact__map {
+        width: 100%;
+        height: 300px;
+    }
+
+    .contact {
+        flex-direction: column;
+    }
+
+    .navbar {
+        flex-direction: column;
+    }
+
+    .navbar a {
+        margin-bottom: 20px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    /* Стили, которые применятся для экранов с шириной 600px и меньше (мобильные устройства) */
+    body {
+        font-size: 1em;
+    }
+
+    .heading__title {
+        font-size: 2rem;
+    }
+
+    .contact__details {
+        gap: 5px;
+    }
+
+    .contact__map {
+        height: 200px;
+    }
+
+    .navbar {
+        padding: 10px;
+    }
+}
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div>
+    <a href="/">Главная</a>
+    <a href="/news.html">Новости</a>
+    <a href="/documents.html">Документы</a>
+    <a href="/contact.html">Контакты</a>
+    </div>
+    <div>
+    <a href="/auth.html"class="button">Вход</a>
+    <a href="/profile.html"class="button">Профиль</a>
+        </div>
+  </div>
+
+    <div class="heading">
+        <div class="container">
+            <h1 class="heading__title">Контакты</h1>
+        </div>
+    </div>
+
+    <main class="main container">
+        <article class="contact__text">
+            <p><strong>Юридический адрес:</strong></p><p>644018, Омская Область, г. Омск, ул. П. Будеркина, д.2</p>
+            
+            <p>Правление ТСН СНТ «Шинник-1» находится по адресу:&nbsp;</p>
+            <p>8-я аллея, 281, территория СОСН Шинник-1, Омск</p>
+
+            <p><strong>часы работы Правления</strong>&nbsp;&nbsp;</p>
+            <p>с мая по октябрь — по субботам и воскресеньям с 10-00 до 13-00</p>
+            <p>с ноября по апрель — ..........</p>
+
+            <p><strong>Председатель правления </strong>— Шарапов Виталий Иванович тел. +7-913-646-55-97<br>&nbsp;</p>
+            <p><strong>Бухгалтер</strong> — .......</p>
+            <p><strong>Состав правления</strong> — .......<br>&nbsp;</p>    
+        </article>
+        <section class="contact">
+            <div class="contact__details">
+                <div class="contact__item"><a class="contact__link" href="mailto:domo_pc6@bk.ru">
+
+                    <span>domo_pc6@bk.ru</span></a>
+                </div>
+
+                <div class="contact__item"><a class="contact__link" href="tel:+7 913 646-55-97">
+                    <span>+7 913 646-55-97</span></a>
+                </div>
+
+                <div class="contact__item">
+                    <div class="contact__label">Полное наименование</div>
+                    <p>Товарищество собственников недвижимости "Садоводческое некоммерческое товарищество "Шинник-1"</p>
+                </div>
+
+             <div class="contact__item">
+                 <div class="contact__label">Краткое наименование</div>
+                 <p>ТСН "СНТ "Шинник-1"</p>
+             </div>
+
+             <div class="contact__item">
+                 <div class="contact__label">Краткое наименование</div>
+                 <p>Омск, территория СОСН Шинник-1</p>
+             </div>
+         </div>
+
+         <div>
+             <div id="map" class="contact__map"></div>
+             <script src="https://api-maps.yandex.ru/2.1/?apikey=<Your-API-Key>&lang=ru_RU" type="text/javascript"></script>
+             <script type="text/javascript">
+                 ymaps.ready(function () {
+                     var myMap = new ymaps.Map('map', {
+                        center: [54.870297, 73.330971],
+                        zoom: 15
+                   }, {
+                    searchControlProvider: 'yandex#search'
+                   }),
+
+                   myGeoObject = new ymaps.GeoObject({
+                    // Описание геометрии
+                    geometry: {
+                        type: "Point",
+                        coordinates: [54.870297, 73.330971]
+                    },
+                    // Свойства
+                    properties: {
+                        // Контент метки
+                        iconContent: 'ТСН СНТ Шинник-1',
+                        //balloonContent: 'Содержимое всплывающей подсказки'
+                    }
+                }, 
+                {
+                    preset: 'islands#blackStretchyIcon',
+                    draggable: true
+                });
+
+                myMap.geoObjects
+                    .add(myGeoObject);
+            });
+         </script>
+
+         <div id="comp_6bacdac400a6882c64ccf2382fcb516a">
+             <h2 class="section__title form__title">Написать председателю</h2>
+
+             <form method="POST" id="feedback-form" enctype="multipart/form-data" action="/send_email/" class="form form__contact">
+                <div class="form__item">
+                     <label for="inputName" class="form__label">Имя</label>
+                     <input id="inputName" class="form__input form__input--text" type="text" name="user_name" value="" placeholder="Ваше имя" required="">
+                 </div>
+                 <div class="form__item">
+                     <label for="inputEmail" class="form__label">E-mail</label>
+                     <input id="inputEmail" class="form__input form__input--text" type="text" name="user_email" value="" placeholder="Электронная почта" required="">
+                 </div>
+                 <div class="form__item">
+                     <label for="inputPhone" class="form__label">Номер телефона</label>
+                     <input id="inputPhone" class="form__input form__input--text" type="text" name="user_phone" data-field-type="phone" value="" placeholder="Телефон" required="">
+                 </div>
+                 <div class="form__item">
+                     <label for="textareaMessage" class="form__label">Сообщение</label>
+                     <textarea id="textareaMessage" rows="5" class="form__input form__input--text" name="MESSAGE" placeholder="Ваше сообщение" requiared=""></textarea>
+                 </div>
+
+                 <div class="form__item form__item--file">
+                     <div style="
+                        width: 100%;
+                        flex: 1 1 100%;
+                        display: flex;
+                        align-items: flex-start;
+                        ">
+                        <div class="form__label">Прикрепить файл</div>
+                        <input type="file" name="file" id="formfile">
+                        <label for="formfile" class="label-file">
+                            <span id="filename" class="label__text">Выбрать файл</span>
+                        </label>
+                        <div id="feedback-error" class="message message__error hidden"></div>
+                    </div>
+                    <div id="feedback-success" class="message message__success hidden"></div>
+                    <div class="form__item form__submit" style="display: flex; flex-direction: column;">
+                        <input type="hidden" name="PARAMS_HASH" value="">
+                        <button type="submit" class="btn btn-submit">Написать председателю</button>
+                    </div>
+             </div>
+             <script>
+                 document.getElementById("formfile").addEventListener("change", function(e){
+                     var fileName = e.target.files[0].name;
+                     document.getElementById("filename").textContent = fileName;
+                 });
+             </script>
+                 <script>
+    document.getElementById("feedback-form").addEventListener("submit", function(e){
+        e.preventDefault(); // Prevents default form submission to server
+
+        var formData = new FormData(e.target); // Grabs all form data for submission
+
+        fetch('/send_email/', {
+            method: 'POST',
+            body: formData,
+        }).then((response) => {
+            if (response.ok) {
+                alert('Форма успешно отправлена');
+                // OR
+                document.getElementById('feedback-success').classList.remove('hidden');
+                document.getElementById('feedback-success').textContent = 'Форма успешно отправлена';
+            } else {
+                alert('Ошибочка вышла!');
+                // OR
+                document.getElementById('feedback-error').classList.remove('hidden');
+                document.getElementById('feedback-error').textContent = 'Ошибка отправки формы';
+            }
+        }).catch((error) => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+             </form>
+         </div>                
+     </div>
+</section>
+</main>
+</body>
+</html>"
