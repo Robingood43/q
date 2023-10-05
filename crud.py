@@ -26,7 +26,6 @@ class Crud:
             ).order_by(News.date_add)
             result = await session.execute(news)
             result = result.fetchall()
-            print(result)
             return result
 
 
@@ -55,7 +54,6 @@ class Crud:
             res = await session.execute(select(User).where(User.username == user))
             await session.commit()
             result = res.scalars().first()  # достаем первого пользователя из результатов
-            print(result)
             return result
 
     # async def user_add(self, async_session: async_sessionmaker[AsyncSession], user: User):
