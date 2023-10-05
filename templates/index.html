@@ -317,7 +317,7 @@ button.close {
                         <div class="item__intro item__text"style="white-space: pre-line; text-align: justify; font-style: italic; color: #333;"></div>
                 {% endif %}
                 <div class="item__date announce__date">{{ ad.date_add }}</div>
-                <div class="item__date announce__more"title="Нажмите, чтобы открыть: {{ ad.title }}"  onclick="window.location.href='/news/open/{{ ad.title }}' " style="cursor: pointer;">{{ ad.more }}</div>
+                <div class="item__date announce__more"title="Нажмите, чтобы открыть: {{ ad.title }}"  onclick="window.location.href='/open/{{ ad.title }}' " style="cursor: pointer;">{{ ad.more }}</div>
             </div>
 
           </article>
