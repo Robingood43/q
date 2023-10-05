@@ -1,0 +1,16 @@
+fastapi
+sqlalchemy
+python-dotenv
+uvicorn
+asyncpg
+pydantic[email]
+jinja2
+python-multipart
+starlette
+aiosmtplib
+passlib
+python-jose
+bcrypt
+itsdangerous
+pdfminer.six
+pymupdf
