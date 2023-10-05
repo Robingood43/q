@@ -35,8 +35,8 @@ db = Crud()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Определяем токен для аутентификации
-SECRET_KEY = os.getenv('secret_key')
-ALGORITHM = os.getenv('ALGORITHM')
+SECRET_KEY = str(os.getenv('secret_key'))
+ALGORITHM = str(os.getenv('ALGORITHM'))
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
