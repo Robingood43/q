@@ -1,11 +1,14 @@
 # В documents будут егрн, квитанции, устав, фз, свидетельство
 #в news будут сметы, собрания, объявления, отчеты, акты
+import asyncio
 import datetime
 import glob
 import os
+from concurrent.futures import ThreadPoolExecutor
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from functools import lru_cache
 
 import aiosmtplib
 from fastapi import FastAPI, Request, Form, UploadFile, status, HTTPException, Depends
@@ -42,44 +45,82 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 @app.get("/open/{filename}", response_class=HTMLResponse)
 async def open_pdf(filename: str, request: Request):
-        if os.path.exists(f"static/temporary/{filename}"):
-            return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": [f"static/temporary/{filename}/{i}" for i in os.listdir(
-                f"static/temporary/{filename}/")], 'filename':filename})
-        else:
-            try:
-                pdf_images = []
-                doc = fitz.open(f'static/news/{filename}')  # open document
-                os.makedirs(f'static/temporary/{filename}')
-                for page in doc:  # iterate through the pages
-                    pix = page.get_pixmap()  # render page to an image
-                    pix.save(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                    pdf_images.append(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": pdf_images, 'filename':filename})
-            except fitz.fitz.FileNotFoundError as e:
-                pdf_images = []
-                doc = fitz.open(f'static/documents/{filename}')  # open document
-                os.makedirs(f'static/temporary/{filename}')
-                for page in doc:  # iterate through the pages
-                    pix = page.get_pixmap()  # render page to an image
-                    pix.save(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                    pdf_images.append(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": pdf_images, 'filename':filename})
+    if os.path.exists(f"static/temporary/{filename}"):
+        return templates.TemplateResponse("pdf_viewer.html",
+                                          {"request": request,
+                                           "photos": [f"static/temporary/{filename}/{i}"
+                                                      for i in os.listdir(f"static/temporary/{filename}/")],
+                                           'filename': filename})
+    else:
+        return await create_and_save_pixmaps(request, filename)
 
+
+async def create_and_save_pixmaps(request, filename):
+    loop = asyncio.get_event_loop()
+    try:
+        pdf_images_path = await loop.run_in_executor(None, save_pixmaps_to_file_lru, f'static/news/{filename}',
+                                                     filename)
+    except fitz.fitz.FileNotFoundError:
+        pdf_images_path = await loop.run_in_executor(None, save_pixmaps_to_file_lru, f'static/documents/{filename}',
+                                                     filename)
+
+    return templates.TemplateResponse("pdf_viewer.html",
+                                      {"request": request, "photos": pdf_images_path, 'filename': filename})
+
+
+@lru_cache(maxsize=128)
+def save_pixmaps_to_file_lru(file_path, filename):
+    return save_pixmaps_to_file(file_path, filename)
+
+
+def save_pixmaps_to_file(file_path, filename):
+    pdf_images = []
+    doc = fitz.open(file_path)  # open document
+    os.makedirs(f'static/temporary/{filename}', exist_ok=True)
+    for page in doc:  # iterate through the pages
+        pix = page.get_pixmap()  # render page to an image
+        png_path = f"static/temporary/{filename}/{filename}page-{page.number}.png"
+        pix.save(png_path)
+        pdf_images.append(png_path)
+
+    return pdf_images
+
+
+executor = ThreadPoolExecutor()
+
+@lru_cache(maxsize=128)
+def extract_text_cached(filename):
+    return extract_text(
+        filename,
+        maxpages=1,
+        laparams=LAParams(boxes_flow=None)
+        ).splitlines()
+
+async def extract_text_async(filename):
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(executor, extract_text_cached, filename)
+    return result
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     messages = request.session.pop('flash', {})
     ads = []
 
-    for i in await db.get_all_news(session):
+    news = await db.get_all_news(session)
+    tasks = [extract_text_async(f'static/news/{n.filename}') for n in news if '.pdf' in n.filename]
+    descriptions = await asyncio.gather(*tasks)
+
+    for i, desc in zip(news, descriptions):
         if '.pdf' in i.filename:
-            ads.append(Ad(title=i.filename, date_add=i.date_add,
-                          description=(extract_text(f'static/news/{i.filename}', maxpages=1, laparams=LAParams(boxes_flow=None)).splitlines()),
-                          more = "Подробнее"))
-
-
+            ads.append(Ad(
+                title=i.filename,
+                date_add=i.date_add,
+                description=desc,
+                more="Подробнее"
+                ))
 
     return templates.TemplateResponse("index.html", {"request": request, "ads": ads, "messages": messages})
 
