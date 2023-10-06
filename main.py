@@ -52,7 +52,7 @@ async def open_pdf(filename: str, request: Request):
         return templates.TemplateResponse("pdf_viewer.html",
                                           {"request": request,
                                            "photos": [f"static/temporary/{filename}/{i}"
-                                                      for i in os.listdir(f"static/temporary/{filename}/")],
+                                                      for i in sorted(os.listdir(f"static/temporary/{filename}/"))],
                                            'filename': filename})
     else:
         return await create_and_save_pixmaps(request, filename)
@@ -68,7 +68,7 @@ async def create_and_save_pixmaps(request, filename):
                                                      filename)
 
     return templates.TemplateResponse("pdf_viewer.html",
-                                      {"request": request, "photos": pdf_images_path, 'filename': filename})
+                                      {"request": request, "photos": sorted(pdf_images_path), 'filename': filename})
 
 
 @lru_cache(maxsize=128)
