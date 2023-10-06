@@ -4,6 +4,8 @@ import os
 import glob
 import re
 import aiosmtplib
+from concurrent.futures import ThreadPoolExecutor
+
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -103,25 +105,41 @@ async def read_root(request: Request):
 @app.get("/news/{document_name}", response_class=HTMLResponse)
 async def download_news(document_name):
     return FileResponse(path="static/news/"+document_name)
+    
+executor = ThreadPoolExecutor()
 
+@lru_cache(maxsize=128)
+def extract_text_cached(filename):
+    return extract_text(
+        filename,
+        maxpages=1,
+        laparams=LAParams(boxes_flow=None)
+        ).splitlines()
 
-@app.get("/news.html", response_class=HTMLResponse)
-async def get_news(request: Request):
-    all_data = await db.get_all_news(session)
-    all_news_db = {i.filename for i in all_data}
-    all_news_path = {os.path.basename(i) for i in glob.glob("static/news/*")}
-    news_add = all_news_path.difference(all_news_db)
-    news_delete = all_news_db.difference(all_news_path)
+async def extract_text_async(filename):
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(executor, extract_text_cached, filename)
+    return result
 
-    if news_add:
-        news_docs = [News(size = f"{(os.path.getsize('static/news/'+filename) / 1024):.2f}",
-                            filename = filename,
-                            date_add = datetime.datetime.now().date())for filename in news_add]
-        await db.add_news(session, news_docs)
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    messages = request.session.pop('flash', {})
+    ads = []
 
-    if news_delete:
-        await db.delete_news(session, list(news_delete))
-    return templates.TemplateResponse("news.html", {"request": request, "news": await db.get_all_news(session)})
+    news = await db.get_all_news(session)
+    tasks = [extract_text_async(f'static/news/{n.filename}') for n in news if '.pdf' in n.filename]
+    descriptions = await asyncio.gather(*tasks)
+
+    for i, desc in zip(news, descriptions):
+        if '.pdf' in i.filename:
+            ads.append(Ad(
+                title=i.filename,
+                date_add=i.date_add,
+                description=desc,
+                more="Подробнее"
+                ))
+
+    return templates.TemplateResponse("index.html", {"request": request, "ads": ads, "messages": messages})
 
 
 
