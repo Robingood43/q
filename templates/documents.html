@@ -79,8 +79,14 @@
             }
 
             @media screen and (max-width: 640px) {
-                .body{font-size: 1.2em;}
-                .navbar{display:none;}
+  body {
+    font-size: 14px; /* Уменьшаем размер шрифта */
+  }
+
+  .navbar {
+    display: unset;
+    flex-direction: column; /* элементы меню в столбец */
+  }
                 .document {
                     margin-left: 0;
                     margin-right: 0;
