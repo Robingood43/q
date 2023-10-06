@@ -25,6 +25,8 @@ from crud import Crud
 from models import Ad, Document, ContactForm, MyUploadFile, News
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from pdfminer.high_level import extract_text
+from functools import lru_cache
+import asyncio
 
 app = FastAPI(docs_url=None, redoc_url=None)
 app.add_middleware(SessionMiddleware, secret_key="some-random-string")
@@ -43,28 +45,45 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.get("/open/{filename}", response_class=HTMLResponse)
 async def open_pdf(filename: str, request: Request):
-        if os.path.exists(f"static/temporary/{filename}"):
-            return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": [f"static/temporary/{filename}/{i}" for i in os.listdir(f"static/temporary/{filename}/")], 'filename':filename})
-        else:
-            try:
-                pdf_images = []
-                doc = fitz.open(f'static/news/{filename}')  # open document
-                os.makedirs(f'static/temporary/{filename}')
-                for page in doc:  # iterate through the pages
-                    pix = page.get_pixmap()  # render page to an image
-                    pix.save(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                    pdf_images.append(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": pdf_images, 'filename':filename})
-            except fitz.fitz.FileNotFoundError as e:
-                pdf_images = []
-                doc = fitz.open(f'static/documents/{filename}')  # open document
-                os.makedirs(f'static/temporary/{filename}')
-                for page in doc:  # iterate through the pages
-                    pix = page.get_pixmap()  # render page to an image
-                    pix.save(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                    pdf_images.append(f"static/temporary/{filename}/{filename}page-{page.number}.png")
-                return templates.TemplateResponse("pdf_viewer.html", {"request": request, "photos": pdf_images, 'filename':filename})
+    if os.path.exists(f"static/temporary/{filename}"):
+        return templates.TemplateResponse("pdf_viewer.html",
+                                          {"request": request,
+                                           "photos": [f"static/temporary/{filename}/{i}"
+                                                      for i in os.listdir(f"static/temporary/{filename}/")],
+                                           'filename': filename})
+    else:
+        return await create_and_save_pixmaps(request, filename)
 
+
+async def create_and_save_pixmaps(request, filename):
+    loop = asyncio.get_event_loop()
+    try:
+        pdf_images_path = await loop.run_in_executor(None, save_pixmaps_to_file_lru, f'static/news/{filename}',
+                                                     filename)
+    except fitz.fitz.FileNotFoundError:
+        pdf_images_path = await loop.run_in_executor(None, save_pixmaps_to_file_lru, f'static/documents/{filename}',
+                                                     filename)
+
+    return templates.TemplateResponse("pdf_viewer.html",
+                                      {"request": request, "photos": pdf_images_path, 'filename': filename})
+
+
+@lru_cache(maxsize=128)
+def save_pixmaps_to_file_lru(file_path, filename):
+    return save_pixmaps_to_file(file_path, filename)
+
+
+def save_pixmaps_to_file(file_path, filename):
+    pdf_images = []
+    doc = fitz.open(file_path)  # open document
+    os.makedirs(f'static/temporary/{filename}', exist_ok=True)
+    for page in doc:  # iterate through the pages
+        pix = page.get_pixmap()  # render page to an image
+        png_path = f"static/temporary/{filename}/{filename}page-{page.number}.png"
+        pix.save(png_path)
+        pdf_images.append(png_path)
+
+    return pdf_images
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
