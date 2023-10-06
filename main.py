@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import glob
 import os
+from concurrent.futures import ThreadPoolExecutor
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -88,18 +89,38 @@ def save_pixmaps_to_file(file_path, filename):
     return pdf_images
 
 
+executor = ThreadPoolExecutor()
+
+@lru_cache(maxsize=128)
+def extract_text_cached(filename):
+    return extract_text(
+        filename,
+        maxpages=1,
+        laparams=LAParams(boxes_flow=None)
+        ).splitlines()
+
+async def extract_text_async(filename):
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(executor, extract_text_cached, filename)
+    return result
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     messages = request.session.pop('flash', {})
     ads = []
 
-    for i in await db.get_all_news(session):
+    news = await db.get_all_news(session)
+    tasks = [extract_text_async(f'static/news/{n.filename}') for n in news if '.pdf' in n.filename]
+    descriptions = await asyncio.gather(*tasks)
+
+    for i, desc in zip(news, descriptions):
         if '.pdf' in i.filename:
-            ads.append(Ad(title=i.filename, date_add=i.date_add,
-                          description=(extract_text(f'static/news/{i.filename}', maxpages=1, laparams=LAParams(boxes_flow=None)).splitlines()),
-                          more = "Подробнее"))
-
-
+            ads.append(Ad(
+                title=i.filename,
+                date_add=i.date_add,
+                description=desc,
+                more="Подробнее"
+                ))
 
     return templates.TemplateResponse("index.html", {"request": request, "ads": ads, "messages": messages})
 
