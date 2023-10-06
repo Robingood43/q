@@ -1,14 +1,16 @@
 # В documents будут егрн, квитанции, устав, фз, свидетельство
 #в news будут сметы, собрания, объявления, отчеты, акты
-import os
+import asyncio
+import datetime
 import glob
-import re
-import aiosmtplib
+import os
 from concurrent.futures import ThreadPoolExecutor
-
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from functools import lru_cache
+
+import aiosmtplib
 from fastapi import FastAPI, Request, Form, UploadFile, status, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -17,18 +19,16 @@ from fastapi.staticfiles import StaticFiles
 from fitz import fitz
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from pdfminer.high_level import extract_text
 from pdfminer.layout import LAParams
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import FileResponse, JSONResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
-import datetime
-from db import engine
+
 from crud import Crud
+from db import engine
 from models import Ad, Document, ContactForm, MyUploadFile, News
-from sqlalchemy.ext.asyncio import async_sessionmaker
-from pdfminer.high_level import extract_text
-from functools import lru_cache
-import asyncio
 
 app = FastAPI(docs_url=None, redoc_url=None)
 app.add_middleware(SessionMiddleware, secret_key="some-random-string")
@@ -40,10 +40,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Определяем токен для аутентификации
 SECRET_KEY = str(os.getenv('secret_key'))
-ALGORITHM = str(os.getenv('ALGORITHM'))
+ALGORITHM = os.getenv('ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 @app.get("/open/{filename}", response_class=HTMLResponse)
 async def open_pdf(filename: str, request: Request):
@@ -87,28 +88,10 @@ def save_pixmaps_to_file(file_path, filename):
 
     return pdf_images
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    messages = request.session.pop('flash', {})
-    ads = []
 
-    for i in await db.get_all_news(session):
-        if '.pdf' in i.filename:
-            ads.append(Ad(title=i.filename, date_add=i.date_add,
-                          description=(extract_text(f'static/news/{i.filename}', maxpages=1, laparams=LAParams(boxes_flow=None)).splitlines()),
-                          more = "Подробнее"))
-
-
-
-    return templates.TemplateResponse("index.html", {"request": request, "ads": ads, "messages": messages})
-
-@app.get("/news/{document_name}", response_class=HTMLResponse)
-async def download_news(document_name):
-    return FileResponse(path="static/news/"+document_name)
-    
 executor = ThreadPoolExecutor()
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=None)
 def extract_text_cached(filename):
     return extract_text(
         filename,
@@ -140,6 +123,29 @@ async def read_root(request: Request):
                 ))
 
     return templates.TemplateResponse("index.html", {"request": request, "ads": ads, "messages": messages})
+
+@app.get("/news/{document_name}", response_class=HTMLResponse)
+async def download_news(document_name):
+    return FileResponse(path="static/news/"+document_name)
+
+
+@app.get("/news.html", response_class=HTMLResponse)
+async def get_news(request: Request):
+    all_data = await db.get_all_news(session)
+    all_news_db = {i.filename for i in all_data}
+    all_news_path = {os.path.basename(i) for i in glob.glob("static/news/*")}
+    news_add = all_news_path.difference(all_news_db)
+    news_delete = all_news_db.difference(all_news_path)
+
+    if news_add:
+        news_docs = [News(size = f"{(os.path.getsize('static/news/'+filename) / 1024):.2f}",
+                            filename = filename,
+                            date_add = datetime.datetime.now().date())for filename in news_add]
+        await db.add_news(session, news_docs)
+
+    if news_delete:
+        await db.delete_news(session, list(news_delete))
+    return templates.TemplateResponse("news.html", {"request": request, "news": await db.get_all_news(session)})
 
 
 
@@ -230,7 +236,7 @@ def create_access_token(data: dict):
     expire = datetime.datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, str(SECRET_KEY), algorithm=ALGORITHM)
 
     return encoded_jwt
 
@@ -246,6 +252,7 @@ def decode_access_token(token: str):
 
 @app.post("/token")
 async def login(response: Request, form_data: OAuth2PasswordRequestForm = Depends(), ):
+
     user = await db.user_check(session, form_data.username)
     if not user:
         response.session["flash"] = {"error": "Неверные данные!"}
@@ -258,6 +265,7 @@ async def login(response: Request, form_data: OAuth2PasswordRequestForm = Depend
     # Установка JWT как cookie
     response.session["access_token"] = f"bearer {access_token}"
     return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
+
 
 def cookie_oauth2_scheme(request: Request):
     token = request.session.get("access_token")
